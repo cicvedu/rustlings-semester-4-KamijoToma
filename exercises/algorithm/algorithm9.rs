@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+// I AM NOT DON
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -18,18 +18,18 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default,
+    T: Default + std::fmt::Debug,
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: vec![],
             comparator,
         }
     }
 
     pub fn len(&self) -> usize {
-        self.count
+        self.items.len()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -38,10 +38,23 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.items.push(value);
+
+        // bubble up
+        let mut child = self.items.len() - 1;
+        while child > 0 {
+            let parent = self.parent_idx(child);
+            if ! (self.comparator)(&self.items[parent], &self.items[child]) {
+                break;
+            }
+            self.items.swap(parent, child);
+            child = parent;
+        }
+        println!("After add: {:?}", &self.items);
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
-        idx / 2
+        (idx-1) / 2
     }
 
     fn children_present(&self, idx: usize) -> bool {
@@ -64,7 +77,7 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default + Ord,
+    T: Default + Ord+std::fmt::Debug,
 {
     /// Create a new MinHeap
     pub fn new_min() -> Self {
@@ -79,13 +92,37 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default+std::fmt::Debug,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.items.len() == 0 {
+            None
+        }else {
+            let mut len = self.items.len();
+            // self.items.swap(0, len-1);
+            let result = self.items.pop();
+
+            // bubble down
+            len -= 1;
+            let mut parent = 0;
+            loop {
+                let mut child = self.left_child_idx(parent);
+                if child >= len {
+                    break;
+                }
+                if child + 1 < len && !(self.comparator)(&self.items[child] , &self.items[child + 1]) {
+                    child += 1;
+                }
+                if !(self.comparator)(&self.items[parent] , &self.items[child]) {
+                    break;
+                }
+                self.items.swap(parent, child);
+                parent = child;
+            }
+            Some(result.unwrap())
+        }
     }
 }
 
@@ -95,7 +132,7 @@ impl MinHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord+std::fmt::Debug,
     {
         Heap::new(|a, b| a < b)
     }
@@ -107,7 +144,7 @@ impl MaxHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord +std::fmt::Debug,
     {
         Heap::new(|a, b| a > b)
     }

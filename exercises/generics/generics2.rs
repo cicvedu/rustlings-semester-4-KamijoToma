@@ -6,14 +6,14 @@
 // Execute `rustlings hint generics2` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+// I AM NOT DON
 
-struct Wrapper {
-    value: u32,
+struct Wrapper<A> {
+    value: A,
 }
 
-impl Wrapper {
-    pub fn new(value: u32) -> Self {
+impl<A> Wrapper<A> {
+    pub fn new(value: A) -> Self {
         Wrapper { value }
     }
 }
